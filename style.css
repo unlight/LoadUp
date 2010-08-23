@@ -1,0 +1,15 @@
+ul.LoadUpForm li.UploadResult label{
+	float: left; 
+	width: 150px; 
+	overflow: hidden;
+	line-height: 32px !important;
+	max-height: 32px !important;
+	font-size: 100%;
+	font-weight: normal;
+}
+
+/*ul.LoadUpForm li.UploadResult input{
+	width: 520px;
+}*/
+
+
