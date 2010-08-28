@@ -98,7 +98,7 @@ class LoadUpPlugin extends Gdn_Plugin {
 
 		$Sender->View = $this->GetView('loadup.php');
 		$Sender->AddSideMenu('dashboard/plugin/loadup');
-		$Sender->AddCssFile('plugins/LoadUp/style.css');
+		//$Sender->AddCssFile('plugins/LoadUp/style.css');
 		$Sender->Render();
 	}
 	
