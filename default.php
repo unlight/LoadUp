@@ -3,34 +3,17 @@
 $PluginInfo['LoadUp'] = array(
 	'Name' => 'Load Up',
 	'Description' => 'Allow users upload files (this is NOT "attachments" for Vanilla 2). Simple upload form.',
-	'Version' => '1.4',
-	'Date' => '10 Aug 2010',
+	'Version' => '1.4.1',
+	'Date' => '10 Nov 2010',
 	'Author' => 'Fox Grinder',
 	'RequiredPlugins' => array('PluginUtils' => '>=1.997'),
-	'RegisterPermissions' => array('Plugins.Garden.LoadUp.Allow', 'Plugins.Garden.LoadUp.Overwrite'),
+	'RegisterPermissions' => array(
+		'Plugins.Garden.LoadUp.Allow',
+		'Plugins.Garden.LoadUp.Overwrite', 
+		'Plugins.Garden.LoadUp.Destination'
+	),
 	'HasLocale' => True
 );
-
-/* =======================================
-CHANGELOG:
-30 Jul 2010 / 1.3
-- allow upload multiple files
-05 Jun 2010	/ 1.1
-- RC related fixes
-
-TODO:
-![alt text](/path/img.jpg "Title") - markdown image markup
-%[alt text](/path/img.jpg "Title") - centered
->
-[alt text](/path/img.jpg "Title")
-[alt text](/path/img.jpg "Title")
-< 
-- mass centered
-
-CLEANUP:
-1. You can remove old fields Plugins.Garden.LoadUp.* from Gdn_Permission table
-
-======================================*/ 
 
 class LoadUpPlugin extends Gdn_Plugin {
 	
@@ -40,14 +23,8 @@ class LoadUpPlugin extends Gdn_Plugin {
 	}
 	
 	public function Setup(){
-		$Config = Gdn::Factory(Gdn::AliasConfig);
-		$Config->Load(PATH_CONF.DS.'config.php', 'Save');
-		$Config->Set('Plugins.LoadUp.Path', 'uploads', False);
-		$Config->Save();
-	}
-	
-	public function PluginController_DummyError_Create(&$Sender) {
-		trigger_error('Dummy error.');
+		if (!C('Plugins.LoadUp.Path'))
+			SaveToConfig('Plugins.LoadUp.Path', 'uploads');
 	}
 	
 	public function PluginController_LoadUp_Create(&$Sender){
@@ -66,35 +43,34 @@ class LoadUpPlugin extends Gdn_Plugin {
 		$Session = Gdn::Session();
 		
 		if ($Sender->Form->AuthenticatedPostBack() != False) {
-
-			$UploadTo = $Sender->Form->GetFormValue('UploadTo', Gdn::Config('Plugins.Garden.LoadUp.Path', 'uploads'));
+			$UploadTo = False;
+			if ($Session->CheckPermission('Plugins.Garden.LoadUp.Destination'))
+				$UploadTo = $Sender->Form->GetFormValue('UploadTo', Gdn::Config('Plugins.Garden.LoadUp.Path', 'uploads'));
+			if (!$UploadTo) $UploadTo = 'uploads' . DS . date('Y');
 			$bOverwrite = $Sender->Form->GetFormValue('Overwrite') && $Session->CheckPermission('Plugins.Garden.LoadUp.Overwrite');
 			$bRename = $Sender->Form->GetFormValue('Rename');
 			$Upload = new Gdn_Upload();
 			
-			for($Count = count(GetValueR('Files.name', $_FILES)), $i = 0; $i < $Count; $i++){
+			for($Count = count(GetValueR('Files.name', $_FILES)), $i = 0; $i < $Count; $i++) {
 				$_FILES['File'] = array();
-				foreach(array('name', 'type', 'tmp_name', 'error', 'size') as $Key){
+				foreach(array('name', 'type', 'tmp_name', 'error', 'size') as $Key) {
 					$Value = GetValueR("Files.{$Key}.{$i}", $_FILES);
 					SetValue($Key, $_FILES['File'], $Value);
 				}
 				$Temp = $Upload->ValidateUpload('File', False);
 				$Name = $Upload->GetUploadedFileName();
-				if($Temp === False){
+				if ($Temp === False) {
 					$Sender->Form->AddError($Upload->Exception);
 					continue;
 				}
 				$TargetFile = GenerateCleanTargetName($UploadTo, $Name, '', $Temp, $bOverwrite);
-				/*if (file_exists($TargetFile)) {
-					if ($bRename) $TargetFile = GenerateCleanTargetName($UploadTo, $Name);
-					elseif (!$bOverwrite) $Sender->Form->AddError(sprintf(T('File exists (%s)! Rename or confirm to overwrite.'), $Name));
-				}*/
 				$Upload->SaveAs($Temp, $TargetFile);
 				$Sender->UploadedFiles[] = $TargetFile;
 			}
 		}
 		
-		$Sender->UploadTo = $this->CollectUploadTo();
+		if ($Session->CheckPermission('Plugins.Garden.LoadUp.Destination'))
+			$Sender->UploadTo = $this->CollectUploadTo();
 
 		$Sender->View = $this->GetView('loadup.php');
 		$Sender->AddSideMenu('dashboard/plugin/loadup');
@@ -130,28 +106,11 @@ class LoadUpPlugin extends Gdn_Plugin {
 	
 	
 	public static function Upload($TargetFolder, $InputName, $bOverwrite = False, $bRename = False){
-		trigger_error(__METHOD__.'() deprecated.', E_USER_ERROR);
-		/*if(!$TargetFolder) $TargetFolder = C('Plugins.LoadUp.Path', 'uploads');
-		
-		$Files = ArrayValue('File', $_FILES);
-
-		$Upload = new Gdn_Upload();
-		$this->Upload =& $Upload;
-		
-		$Upload->AllowFileExtension('doc');
-		
-		$Temp = $Upload->ValidateUpload($InputName, False);
-		if($Temp === False) return $Temp;
-		
-		$Name =  ArrayValue('name', ArrayValue('File', $_FILES));
-		$TargetFile = GenerateCleanTargetName($TargetFolder, $Name, '', $Temp, $bOverwrite);
-		
-		if (file_exists($TargetFile)) {
-			if ($bRename) $TargetFile = GenerateCleanTargetName($TargetFolder, $Name);
-			elseif (!$bOverwrite) throw new Exception(sprintf(T('File exists (%s)! Rename or confirm to overwrite.'), $Name));
-		}
-		$Upload->SaveAs($Temp, $TargetFile);
-		return $TargetFile;*/
+		trigger_error(__METHOD__.'() deprecated. Use UploadFile() instead.', E_USER_DEPRECATED);
+	}
+	
+	public function PluginController_DummyError_Create(&$Sender) {
+		trigger_error('Dummy error.');
 	}
 	
 }

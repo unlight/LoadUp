@@ -26,6 +26,7 @@ if ($UploadOK != False) {
 	echo $this->Form->TextBox('RawData', $Options);
 	//echo $this->Form->CheckBox('WithDomain', Gdn::Translate('WithDomain'));
 	echo '</li>';
+	echo Wrap($this->Form->CheckBox('WithDomain', T('With Domain')), 'li');
 }
 ?>
 
@@ -35,8 +36,11 @@ if ($UploadOK != False) {
 </li>
 
 <li>
-<?php echo $this->Form->Label('Upload To', 'UploadTo') ?>
-<?php echo $this->Form->DropDown('UploadTo', $this->UploadTo, array('IncludeNull' => True)) ?>
+<?php if(isset($this->UploadTo)) {
+	echo $this->Form->Label('Upload To', 'UploadTo');
+	echo $this->Form->DropDown('UploadTo', $this->UploadTo, array('IncludeNull' => True));
+}
+?>
 </li>
 
 <li>
