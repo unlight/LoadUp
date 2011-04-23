@@ -3,10 +3,10 @@
 $PluginInfo['LoadUp'] = array(
 	'Name' => 'Load Up',
 	'Description' => 'Allow users upload files (this is NOT "attachments" for Vanilla 2). Simple upload form.',
-	'Version' => '1.4.1',
-	'Date' => '10 Nov 2010',
+	'Version' => '1.5.16',
+	'Date' => '6 Mar 2011',
 	'Author' => 'Fox Grinder',
-	'RequiredPlugins' => array('PluginUtils' => '>=1.997'),
+	'RequiredPlugins' => array('UsefulFunctions' => '>=1.997'),
 	'RegisterPermissions' => array(
 		'Plugins.Garden.LoadUp.Allow',
 		'Plugins.Garden.LoadUp.Overwrite', 
@@ -17,22 +17,22 @@ $PluginInfo['LoadUp'] = array(
 
 class LoadUpPlugin extends Gdn_Plugin {
 	
-	public function Base_GetAppSettingsMenuItems_Handler(&$Sender){
+	public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
 		$Menu =& $Sender->EventArguments['SideMenu'];
 		$Menu->AddLink('Dashboard', Gdn::Translate('Upload File'), 'dashboard/plugin/loadup', 'Plugins.Garden.LoadUp.Allow');
 	}
 	
-	public function Setup(){
+	public function Setup() {
 		if (!C('Plugins.LoadUp.Path'))
 			SaveToConfig('Plugins.LoadUp.Path', 'uploads');
 	}
 	
-	public function PluginController_LoadUp_Create(&$Sender){
+	public function PluginController_LoadUp_Create(&$Sender) {
 		
 		$Sender->UploadedFiles = array();
 		
 		$Sender->Permission('Plugins.Garden.LoadUp.Allow');
-		if(!property_exists($Sender, 'Form')) $Sender->Form = Gdn::Factory('Form');
+		if (!property_exists($Sender, 'Form')) $Sender->Form = Gdn::Factory('Form');
 		
 		$Sender->AddJsFile('jquery.livequery.js');
 		$Sender->AddJsFile('jquery.autogrow.js');
@@ -69,18 +69,22 @@ class LoadUpPlugin extends Gdn_Plugin {
 			}
 		}
 		
-		if ($Session->CheckPermission('Plugins.Garden.LoadUp.Destination'))
+		if ($Session->CheckPermission('Plugins.Garden.LoadUp.Destination')) {
+			// TODO: FIX ME, TO SLOOOOW
+			// POSSIBLE CUSTOM DIRECTORIES
 			$Sender->UploadTo = $this->CollectUploadTo();
-
+		}
+		
 		$Sender->View = $this->GetView('loadup.php');
 		$Sender->AddSideMenu('dashboard/plugin/loadup');
 		//$Sender->AddCssFile('plugins/LoadUp/style.css');
+		$Sender->Title(T('Upload File'));
 		$Sender->Render();
 	}
 	
 
 	
-	protected function CollectUploadTo(){
+	protected function CollectUploadTo() {
 		
 		$UploadTo = array();
 		$LoadUpPath = Gdn::Config('Plugins.Garden.LoadUp.Path', 'uploads');
@@ -104,10 +108,6 @@ class LoadUpPlugin extends Gdn_Plugin {
 		return $UploadTo;
 	}
 	
-	
-	public static function Upload($TargetFolder, $InputName, $bOverwrite = False, $bRename = False){
-		trigger_error(__METHOD__.'() deprecated. Use UploadFile() instead.', E_USER_DEPRECATED);
-	}
 	
 	public function PluginController_DummyError_Create(&$Sender) {
 		trigger_error('Dummy error.');

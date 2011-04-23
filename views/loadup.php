@@ -27,6 +27,7 @@ if ($UploadOK != False) {
 	//echo $this->Form->CheckBox('WithDomain', Gdn::Translate('WithDomain'));
 	echo '</li>';
 	echo Wrap($this->Form->CheckBox('WithDomain', T('With Domain')), 'li');
+	echo Wrap($this->Form->CheckBox('MakeMarkDownIDs', T('Markdown IDs')), 'li');
 }
 ?>
 
