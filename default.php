@@ -3,16 +3,15 @@
 $PluginInfo['LoadUp'] = array(
 	'Name' => 'Load Up',
 	'Description' => 'Allow users upload files (this is NOT "attachments" for Vanilla 2). Simple upload form.',
-	'Version' => '1.5.16',
-	'Date' => '6 Mar 2011',
+	'Version' => '1.6.17',
+	'Date' => 'Summer 2011',
 	'Author' => 'Fox Grinder',
-	'RequiredPlugins' => array('UsefulFunctions' => '>=1.997'),
+	'RequiredPlugins' => array('UsefulFunctions' => '>=3.0'),
 	'RegisterPermissions' => array(
 		'Plugins.Garden.LoadUp.Allow',
 		'Plugins.Garden.LoadUp.Overwrite', 
 		'Plugins.Garden.LoadUp.Destination'
-	),
-	'HasLocale' => True
+	)
 );
 
 class LoadUpPlugin extends Gdn_Plugin {
@@ -20,6 +19,20 @@ class LoadUpPlugin extends Gdn_Plugin {
 	public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
 		$Menu =& $Sender->EventArguments['SideMenu'];
 		$Menu->AddLink('Dashboard', Gdn::Translate('Upload File'), 'dashboard/plugin/loadup', 'Plugins.Garden.LoadUp.Allow');
+	}
+	
+	public function Tick_Match_30_Minutes_05_Hours_Handler() { // every night
+		// 1. Clean-up temp uploads
+		$KeepThis = array('README');
+		$MonthAgo = strtotime('30 days ago');
+		$Directory = 'uploads/tmp';
+		if (!file_exists($Directory)) return;
+		foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($Directory)) as $File) {
+			if (in_array($File->GetFilename(), $KeepThis)) continue;
+			$Pathname = $File->GetPathname();
+			if ($MonthAgo > $File->GetMTime()) unlink($Pathname);
+			Console::Message('Removed: ^3%s', $Pathname);
+		}
 	}
 	
 	public function Setup() {
