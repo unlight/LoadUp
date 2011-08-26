@@ -44,8 +44,6 @@ class LoadUpPlugin extends Gdn_Plugin {
 		$Sender->AddJsFile('jquery.livequery.js');
 		$Sender->AddJsFile('jquery.autogrow.js');
 		$Sender->AddJsFile('plugins/LoadUp/loadup.js');
-		$Sender->AddJsFile('plugins/LoadUp/jquery.clipboard.js');
-		$Sender->AddDefinition('TextClipboarded', Gdn::Translate('saved to clipboard.'));
 		
 		$Session = Gdn::Session();
 		
