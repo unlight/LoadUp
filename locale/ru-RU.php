@@ -43,5 +43,8 @@ $Definition['With Domain'] = 'Полный УРЛ';
 // b13
 $Definition['Markdown IDs'] = 'Markdown IDs';
 
+// 
+$Definition['Absolute URL'] = 'Абсолютный УРЛ';
+
 
 

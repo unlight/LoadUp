@@ -36,7 +36,6 @@ class LoadUpPlugin extends Gdn_Plugin {
 	
 	public function PluginController_LoadUp_Create(&$Sender) {
 		$Sender->AddSideMenu('dashboard/plugin/loadup');
-		$Sender->UploadedFiles = array();
 		
 		$Sender->Permission('Plugins.Garden.LoadUp.Allow');
 		if (!property_exists($Sender, 'Form')) $Sender->Form = Gdn::Factory('Form');
@@ -52,7 +51,9 @@ class LoadUpPlugin extends Gdn_Plugin {
 			if (!$UploadTo) $UploadTo = 'uploads/i/' . date('Y') . '/' . date('m');
 			$bOverwrite = $Sender->Form->GetFormValue('Overwrite') && $Session->CheckPermission('Plugins.Garden.LoadUp.Overwrite');
 			$Options = array('Overwrite' => $bOverwrite, 'WebTarget' => True);
-			$Sender->UploadedFiles = UploadFile($UploadTo, 'Files', $Options);
+			$UploadedFiles = UploadFile($UploadTo, 'Files', $Options);
+			$Sender->Form->SetFormValue('RawData', implode("\n", $UploadedFiles));
+			$Sender->Form->SetFormValue('AbsoluteURL', 1);
 		}
 		
 		$Sender->UploadTo = array('uploads/tmp' => 'uploads/tmp');

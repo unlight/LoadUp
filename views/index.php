@@ -2,26 +2,26 @@
 
 $Session = Gdn::Session();
 $UploadOK = $this->Form->IsPostBack() && $this->Form->ErrorCount() == 0;
-$UploadOptions = array(Gdn::Translate('ToOverwrite') => 'Overwrite');
 
 ?>
 
 <h1><?php echo Gdn::Translate('Upload File') ?></h1>
 
-<?php echo $this->Form->Open(array('enctype' => 'multipart/form-data')) ?>
-<?php echo $this->Form->Errors() ?>
+<?php 
+echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->Errors();
+?>
 
 <ul class="LoadUpForm">
 
 <?php 
 if ($UploadOK != False) {
+	echo Wrap($this->Form->TextBox('RawData', array('Multiline' => True)), 'li');
 	echo '<li>';
-	echo $this->Form->Label('Result', 'Result');
-	$Options = array('value' => implode("\n", $this->UploadedFiles), 'Multiline' => True);
-	echo $this->Form->TextBox('RawData', $Options);
+	echo $this->Form->CheckBox('WithDomain', T('With Domain'));
+	echo $this->Form->CheckBox('AbsoluteURL', T('Absolute URL'));
+	echo $this->Form->CheckBox('MakeMarkDownIDs', T('Markdown IDs'));
 	echo '</li>';
-	echo Wrap($this->Form->CheckBox('WithDomain', T('With Domain')), 'li');
-	echo Wrap($this->Form->CheckBox('MakeMarkDownIDs', T('Markdown IDs')), 'li');
 }
 ?>
 
