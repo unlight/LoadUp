@@ -9,7 +9,7 @@ $(document).ready(function(){
 	$.clipboardReady(function(){
 		$("#Form_MyResult").hover(function(){
 			var Text = $(this).val();
-			if(Text != ""){
+			if (Text != "") {
 				$.clipboard(Text);
 				Text = Text.replace(/</, "&lt;");
 				Text = Text.replace(/>/, "&gt;");
