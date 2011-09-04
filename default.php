@@ -2,7 +2,7 @@
 
 $PluginInfo['LoadUp'] = array(
 	'Name' => 'Load Up',
-	'Description' => 'Allow users upload files (this is NOT "attachments" for Vanilla 2). Simple upload form.',
+	'Description' => 'Simple upload form for admins.',
 	'Version' => '1.7',
 	'Date' => 'Summer 2011',
 	'Author' => 'Fox Grinder',
